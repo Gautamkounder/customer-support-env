@@ -1,0 +1,84 @@
+spec_version: 1
+name: customer_support_env
+type: space
+runtime: fastapi
+app: customer_support_env.server:app
+port: 7860
+
+description: >
+  A real-world Customer Support Resolution environment for training AI agents.
+  Agents learn to triage, respond to, and escalate customer support tickets
+  through a step/reset/state API with deterministic grading.
+
+tasks:
+  - id: easy_classify
+    name: Ticket Classification
+    difficulty: easy
+    description: >
+      Classify a customer support ticket by category, priority, and sentiment.
+      Single-step task graded on exact match with partial credit.
+
+  - id: medium_reply
+    name: Draft a Reply
+    difficulty: medium
+    description: >
+      Classify a ticket AND draft a professional reply addressing all issues.
+      Two-step task graded on classification accuracy + reply quality rubric.
+
+  - id: hard_resolution
+    name: Full Resolution
+    difficulty: hard
+    description: >
+      Classify, reply, AND make escalation decisions for complex multi-issue tickets.
+      Three-step task with the most demanding grading criteria.
+
+action_space:
+  type: object
+  properties:
+    classify_category:
+      type: string
+      enum: [billing, technical, account, shipping, product, general]
+    classify_priority:
+      type: string
+      enum: [low, medium, high, urgent]
+    classify_sentiment:
+      type: string
+      enum: [positive, neutral, negative, angry]
+    draft_reply:
+      type: string
+    escalation_level:
+      type: string
+      enum: [none, supervisor, manager, legal]
+    escalation_reason:
+      type: string
+    internal_notes:
+      type: string
+
+observation_space:
+  type: object
+  properties:
+    ticket:
+      type: object
+      description: Customer support ticket with subject, body, customer info
+    task_description:
+      type: string
+    step_count:
+      type: integer
+    max_steps:
+      type: integer
+    done:
+      type: boolean
+    reward:
+      type: number
+    feedback:
+      type: string
+    metadata:
+      type: object
+
+tags:
+  - openenv
+  - customer-support
+  - real-world
+  - nlp
+  - classification
+  - text-generation
