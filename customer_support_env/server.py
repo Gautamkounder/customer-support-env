@@ -73,6 +73,11 @@ class HealthResponse(BaseModel):
 
 
 
+@app.get("/", response_model=HealthResponse)
+async def root():
+    return HealthResponse()
+
+
 @app.get("/health", response_model=HealthResponse)
 async def health():
     return HealthResponse()
