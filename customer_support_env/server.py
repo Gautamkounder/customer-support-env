@@ -109,7 +109,7 @@ async def state():
 
 
 def main():
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 7860))
     uvicorn.run(
         "customer_support_env.server:app",
         host="0.0.0.0",
