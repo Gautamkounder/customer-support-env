@@ -1,0 +1,5 @@
+test_validation.py
+__pycache__/
+*.pyc
+outputs/
+.gitignore

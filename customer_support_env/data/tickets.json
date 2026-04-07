@@ -1,0 +1,257 @@
+[
+  {
+    "ticket_id": "TKT-001",
+    "customer_name": "Sarah Chen",
+    "subject": "Can't access my account after password reset",
+    "body": "Hi, I reset my password yesterday using the email link, but now I can't log in. It says 'invalid credentials' every time. I've tried clearing cookies and using a different browser. My email is sarah.chen@example.com. Can you help?",
+    "true_category": "account",
+    "true_priority": "high",
+    "true_sentiment": "neutral",
+    "requires_escalation": false,
+    "expected_resolution_points": [
+      "Acknowledge the login issue",
+      "Suggest verifying the reset email was for the correct account",
+      "Offer to manually reset the password or send a new reset link",
+      "Mention checking spam folder for the reset email"
+    ]
+  },
+  {
+    "ticket_id": "TKT-002",
+    "customer_name": "James Rodriguez",
+    "subject": "Wrong item shipped to me",
+    "body": "I ordered a blue XL hoodie (Order #8834) but received a red M t-shirt instead. This is the second time this has happened! I need the correct item shipped ASAP and a return label for the wrong one. Very frustrated with your quality control.",
+    "true_category": "shipping",
+    "true_priority": "high",
+    "true_sentiment": "negative",
+    "requires_escalation": false,
+    "expected_resolution_points": [
+      "Apologize for the mix-up",
+      "Reference the specific order number",
+      "Confirm correct item will be reshipped",
+      "Provide return label for wrong item",
+      "Acknowledge this is a repeat issue"
+    ]
+  },
+  {
+    "ticket_id": "TKT-003",
+    "customer_name": "Priya Patel",
+    "subject": "Question about subscription plans",
+    "body": "Hello, I'm currently on the Basic plan ($9.99/month) and considering upgrading. Can you tell me the differences between the Pro and Enterprise plans? Specifically interested in API rate limits and team member allowances. Thanks!",
+    "true_category": "general",
+    "true_priority": "low",
+    "true_sentiment": "positive",
+    "requires_escalation": false,
+    "expected_resolution_points": [
+      "Thank them for considering an upgrade",
+      "Outline Pro vs Enterprise differences",
+      "Address API rate limits specifically",
+      "Address team member allowances specifically"
+    ]
+  },
+  {
+    "ticket_id": "TKT-004",
+    "customer_name": "Michael Thompson",
+    "subject": "URGENT: Production API returning 500 errors",
+    "body": "Our production environment has been getting intermittent 500 errors from your API for the last 2 hours. This is affecting our live users. Endpoint: /api/v2/transactions. We're seeing about 30% failure rate. Error payload: {\"error\": \"internal_server_error\", \"request_id\": \"req_9f8a7b6c\"}. We need this resolved immediately — this is costing us revenue.",
+    "true_category": "technical",
+    "true_priority": "urgent",
+    "true_sentiment": "negative",
+    "requires_escalation": true,
+    "expected_resolution_points": [
+      "Acknowledge the severity and urgency",
+      "Reference the specific endpoint and error",
+      "Confirm the issue is being escalated to engineering",
+      "Provide a timeline for follow-up",
+      "Suggest any immediate workarounds"
+    ]
+  },
+  {
+    "ticket_id": "TKT-005",
+    "customer_name": "Emily Watson",
+    "subject": "Charged twice for same order",
+    "body": "Hi there, I just noticed I was charged twice for Order #7721 — $49.99 each time, so $99.98 total when it should have been $49.99. I can see both charges on my credit card statement dated March 15. Can you refund the duplicate charge? My account email is emily.w@example.com.",
+    "true_category": "billing",
+    "true_priority": "high",
+    "true_sentiment": "neutral",
+    "requires_escalation": false,
+    "expected_resolution_points": [
+      "Acknowledge the double charge",
+      "Confirm the order number and amount",
+      "Initiate or promise a refund for the duplicate",
+      "Provide timeline for the refund to appear"
+    ]
+  },
+  {
+    "ticket_id": "TKT-006",
+    "customer_name": "David Kim",
+    "subject": "App crashes when opening camera feature",
+    "body": "The app crashes every time I try to use the camera/scan feature. I'm on iPhone 14 Pro, iOS 17.3, app version 4.2.1. I've tried reinstalling but the issue persists. The crash happens immediately after granting camera permission. Other apps' cameras work fine.",
+    "true_category": "technical",
+    "true_priority": "medium",
+    "true_sentiment": "neutral",
+    "requires_escalation": false,
+    "expected_resolution_points": [
+      "Acknowledge the crash issue",
+      "Note the specific device and OS version",
+      "Suggest clearing app cache or data",
+      "Offer to collect crash logs",
+      "Mention if this is a known issue or will be investigated"
+    ]
+  },
+  {
+    "ticket_id": "TKT-007",
+    "customer_name": "Lisa Hernandez",
+    "subject": "Want to cancel and get refund NOW",
+    "body": "THIS IS RIDICULOUS. I signed up for the annual plan 3 days ago and I want a FULL refund. Your product doesn't do HALF of what your website claims. The 'AI assistant' is just a chatbot that gives generic answers. The 'real-time analytics' take 24 hours to update. I feel SCAMMED. If I don't get my $299 back within 24 hours I'm filing a chargeback AND reporting you to the BBB. This is false advertising plain and simple.",
+    "true_category": "billing",
+    "true_priority": "urgent",
+    "true_sentiment": "angry",
+    "requires_escalation": true,
+    "expected_resolution_points": [
+      "Remain professional and empathetic despite the tone",
+      "Acknowledge specific complaints about AI assistant and analytics",
+      "Address the refund request clearly",
+      "Reference any refund/cancellation policy",
+      "De-escalate without being dismissive",
+      "Offer to connect with a supervisor if needed"
+    ]
+  },
+  {
+    "ticket_id": "TKT-008",
+    "customer_name": "Robert Chang",
+    "subject": "Bulk order inquiry — 500+ units",
+    "body": "Hello, I represent TechCorp Solutions and we're interested in placing a bulk order of approximately 500-700 units of your ProWidget device for our offices. We'd need: 1) Volume pricing 2) Custom branding options 3) Extended warranty terms 4) Dedicated account manager. Could you connect me with your enterprise sales team? Our procurement timeline is Q2 2024.",
+    "true_category": "general",
+    "true_priority": "medium",
+    "true_sentiment": "positive",
+    "requires_escalation": true,
+    "expected_resolution_points": [
+      "Thank them for the interest",
+      "Acknowledge the bulk order size",
+      "Address each of the four requests",
+      "Route to enterprise/sales team",
+      "Provide timeline expectations"
+    ]
+  },
+  {
+    "ticket_id": "TKT-009",
+    "customer_name": "Amanda Foster",
+    "subject": "Delivery stuck in transit for 2 weeks",
+    "body": "Order #9912 was supposed to arrive 12 days ago. Tracking number TRK-88234 hasn't updated since March 3 — it's been stuck at 'In Transit - Regional Facility' for almost 2 weeks now. I paid for express shipping ($15.99 extra). At this point I either need the package located or a full refund including shipping costs. This is unacceptable.",
+    "true_category": "shipping",
+    "true_priority": "high",
+    "true_sentiment": "negative",
+    "requires_escalation": false,
+    "expected_resolution_points": [
+      "Acknowledge the delayed shipment",
+      "Reference the order and tracking numbers",
+      "Explain next steps for locating the package",
+      "Address the express shipping refund",
+      "Offer replacement or full refund option"
+    ]
+  },
+  {
+    "ticket_id": "TKT-010",
+    "customer_name": "Kevin O'Brien",
+    "subject": "Data breach notification — am I affected?",
+    "body": "I saw an article about a data breach at your company last month. I'm a customer since 2021. I need to know: 1) Was my data compromised? 2) What data was accessed (passwords, payment info, personal info)? 3) What steps have you taken? 4) Should I change my password? My account email is kobrien@example.com, account #ACC-44521.",
+    "true_category": "account",
+    "true_priority": "urgent",
+    "true_sentiment": "negative",
+    "requires_escalation": true,
+    "expected_resolution_points": [
+      "Take the security concern seriously",
+      "Address each of the four questions",
+      "Recommend immediate security steps (password change, 2FA)",
+      "Escalate to security team for account-specific investigation",
+      "Provide reference to official breach notification if applicable"
+    ]
+  },
+  {
+    "ticket_id": "TKT-011",
+    "customer_name": "Nina Volkov",
+    "subject": "Feature request: dark mode",
+    "body": "Hey team! Love the product, been using it daily for 6 months. Just wanted to suggest adding a dark mode option. I work late hours and the bright white interface can be tough on the eyes. Would be amazing if you could add this in a future update. Keep up the great work!",
+    "true_category": "product",
+    "true_priority": "low",
+    "true_sentiment": "positive",
+    "requires_escalation": false,
+    "expected_resolution_points": [
+      "Thank them for the feedback and loyalty",
+      "Acknowledge the dark mode request",
+      "Mention if it's on the roadmap or will be shared with the product team",
+      "Show appreciation for the suggestion"
+    ]
+  },
+  {
+    "ticket_id": "TKT-012",
+    "customer_name": "Thomas Wright",
+    "subject": "LEGAL DEMAND — Unauthorized charges on deceased parent's account",
+    "body": "My mother passed away last month. I am the executor of her estate. Upon reviewing her bank statements, I discovered 8 months of charges ($29.99/month = $239.92) to your company on her credit card. She had dementia and could not have authorized this subscription. I have power of attorney documents and a death certificate. I am demanding: 1) Full refund of all charges ($239.92) 2) Immediate account closure 3) Confirmation that all her personal data has been deleted 4) Written acknowledgment of this request for my records. If not resolved within 7 business days, my attorney will be in contact. Account email: mwright@example.com",
+    "true_category": "billing",
+    "true_priority": "urgent",
+    "true_sentiment": "angry",
+    "requires_escalation": true,
+    "expected_resolution_points": [
+      "Express genuine condolences",
+      "Handle with extreme sensitivity and professionalism",
+      "Address each of the four demands specifically",
+      "Escalate to legal/compliance team",
+      "Request copies of legal documents through secure channel",
+      "Provide a specific point of contact for follow-up",
+      "Do not make promises about refund without proper authorization"
+    ]
+  },
+  {
+    "ticket_id": "TKT-013",
+    "customer_name": "Jessica Martinez",
+    "subject": "Integration not syncing with Salesforce",
+    "body": "Our Salesforce integration stopped syncing 3 days ago. We use the bi-directional sync for contacts and deals. Error in the integration dashboard: 'OAUTH_TOKEN_EXPIRED — refresh token invalid'. I've tried disconnecting and reconnecting but get 'Insufficient privileges' on the Salesforce side. We have about 5,000 contacts that haven't synced. Our sales team is working blind without this data. Enterprise plan, Account ID: ENT-2847.",
+    "true_category": "technical",
+    "true_priority": "urgent",
+    "true_sentiment": "negative",
+    "requires_escalation": true,
+    "expected_resolution_points": [
+      "Acknowledge the severity for a sales team",
+      "Reference the specific error messages",
+      "Suggest OAuth re-authorization steps",
+      "Check Salesforce connected app permissions",
+      "Offer to investigate the 5000 unsynced contacts",
+      "Escalate to integrations team"
+    ]
+  },
+  {
+    "ticket_id": "TKT-014",
+    "customer_name": "Alex Rivera",
+    "subject": "Thank you — amazing customer support",
+    "body": "Just wanted to send a quick thank you note! Your agent (Maria, ticket #TKT-8847) went above and beyond helping me migrate my data last week. She stayed on the chat for over an hour and even followed up the next day to make sure everything was working. This kind of service is why I recommend your product to everyone. Please pass along my thanks to Maria and her team! 🙏",
+    "true_category": "general",
+    "true_priority": "low",
+    "true_sentiment": "positive",
+    "requires_escalation": false,
+    "expected_resolution_points": [
+      "Thank them for the kind feedback",
+      "Confirm the feedback will be passed to Maria",
+      "Express appreciation for the recommendation",
+      "Offer continued support"
+    ]
+  },
+  {
+    "ticket_id": "TKT-015",
+    "customer_name": "Mohammed Al-Rashid",
+    "subject": "Unable to export data — GDPR request",
+    "body": "Under GDPR Article 20 (Right to Data Portability), I am formally requesting a complete export of all personal data you hold about me in a machine-readable format. This includes: transaction history, usage logs, profile information, and any analytics data. I also want to know all third parties my data has been shared with (Article 15). Please process this within the 30-day statutory deadline. Account: m.alrashid@example.com, EU resident (Germany).",
+    "true_category": "account",
+    "true_priority": "high",
+    "true_sentiment": "neutral",
+    "requires_escalation": true,
+    "expected_resolution_points": [
+      "Acknowledge the GDPR request formally",
+      "Confirm understanding of Articles 15 and 20",
+      "Outline the data export process",
+      "Commit to the 30-day deadline",
+      "Escalate to data protection officer",
+      "Provide confirmation/reference number"
+    ]
+  }
+]
