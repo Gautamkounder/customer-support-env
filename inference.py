@@ -302,7 +302,8 @@ def run_easy_task(env: "CustomerSupportEnv") -> List[float]:
             action = parse_action(raw)
 
             result = env.step(action)
-            reward = result.reward
+            reward_delta = result.reward
+            reward_cum   = result.observation.reward
             done   = result.done
 
         except Exception as e:
@@ -310,15 +311,15 @@ def run_easy_task(env: "CustomerSupportEnv") -> List[float]:
                   f"{type(e).__name__}: {e}", flush=True)
             traceback.print_exc(file=sys.stdout)
             # Fallback must be > 0.0 for OpenEnv
-            reward, done = 0.01, True
+            reward_delta, reward_cum, done = 0.01, 0.01, True
 
-        scores.append(reward)
+        scores.append(reward_cum)
         log_step(
             task_id=task_id,
             ticket_id=tid,
             step=1,
             max_steps=1,
-            reward=reward,
+            reward=reward_delta,
             done=done,
         )
 
@@ -364,7 +365,8 @@ def run_medium_task(env: "CustomerSupportEnv") -> List[float]:
             action2  = parse_action(raw2)
             result2  = env.step(action2)
 
-            reward = result2.reward
+            reward_delta = result2.reward
+            reward_cum   = result2.observation.reward
             done   = result2.done
 
         except Exception as e:
@@ -372,13 +374,13 @@ def run_medium_task(env: "CustomerSupportEnv") -> List[float]:
                   f"{type(e).__name__}: {e}", flush=True)
             traceback.print_exc(file=sys.stdout)
             # Fallback must be > 0.0 for OpenEnv
-            reward, done = 0.01, True
+            reward_delta, reward_cum, done = 0.01, 0.01, True
 
-        scores.append(reward)
+        scores.append(reward_cum)
         log_step(
             task_id=task_id, ticket_id=tid,
             step=2, max_steps=2,
-            reward=reward, done=done,
+            reward=reward_delta, done=done,
         )
 
     total = sum(scores)
@@ -440,20 +442,21 @@ def run_hard_task(env: "CustomerSupportEnv") -> List[float]:
             action3  = parse_action(raw3)
             result3  = env.step(action3)
 
-            reward = result3.reward
+            reward_delta = result3.reward
+            reward_cum   = result3.observation.reward
             done   = result3.done
 
         except Exception as e:
             print(f"[ERROR] Hard task failed for ticket {tid}: "
                   f"{type(e).__name__}: {e}", flush=True)
             traceback.print_exc(file=sys.stdout)
-            reward, done = 0.01, True
+            reward_delta, reward_cum, done = 0.01, 0.01, True
 
-        scores.append(reward)
+        scores.append(reward_cum)
         log_step(
             task_id=task_id, ticket_id=tid,
             step=3, max_steps=3,
-            reward=reward, done=done,
+            reward=reward_delta, done=done,
         )
 
     total = sum(scores)
