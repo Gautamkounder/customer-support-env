@@ -1,0 +1,41 @@
+{
+  "model": "gpt-4o-mini",
+  "api_base_url": "https://api.openai.com/v1",
+  "easy_classify": {
+    "scores": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "average": 0.0
+  },
+  "medium_reply": {
+    "scores": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "average": 0.0
+  },
+  "hard_resolution": {
+    "scores": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "average": 0.0
+  },
+  "overall_average": 0.0
+}
