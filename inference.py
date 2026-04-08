@@ -302,7 +302,7 @@ def run_easy_task(env: "CustomerSupportEnv") -> List[float]:
             action = parse_action(raw)
 
             result = env.step(action)
-            reward = result.observation.reward
+            reward = result.reward
             done   = result.done
 
         except Exception as e:
@@ -350,7 +350,7 @@ def run_medium_task(env: "CustomerSupportEnv") -> List[float]:
             log_step(
                 task_id=task_id, ticket_id=tid,
                 step=1, max_steps=2,
-                reward=result1.observation.reward,
+                reward=result1.reward,
                 done=result1.done,
             )
 
@@ -364,7 +364,7 @@ def run_medium_task(env: "CustomerSupportEnv") -> List[float]:
             action2  = parse_action(raw2)
             result2  = env.step(action2)
 
-            reward = result2.observation.reward
+            reward = result2.reward
             done   = result2.done
 
         except Exception as e:
@@ -409,7 +409,7 @@ def run_hard_task(env: "CustomerSupportEnv") -> List[float]:
             log_step(
                 task_id=task_id, ticket_id=tid,
                 step=1, max_steps=3,
-                reward=result1.observation.reward,
+                reward=result1.reward,
                 done=result1.done,
             )
 
@@ -426,7 +426,7 @@ def run_hard_task(env: "CustomerSupportEnv") -> List[float]:
             log_step(
                 task_id=task_id, ticket_id=tid,
                 step=2, max_steps=3,
-                reward=result2.observation.reward,
+                reward=result2.reward,
                 done=result2.done,
             )
 
@@ -440,7 +440,7 @@ def run_hard_task(env: "CustomerSupportEnv") -> List[float]:
             action3  = parse_action(raw3)
             result3  = env.step(action3)
 
-            reward = result3.observation.reward
+            reward = result3.reward
             done   = result3.done
 
         except Exception as e:
