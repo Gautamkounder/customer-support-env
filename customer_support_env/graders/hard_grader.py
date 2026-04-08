@@ -181,9 +181,9 @@ class HardGrader:
         return (
             round(total, 4),
             {
-                "classification": cls_score,
-                "reply": reply_score,
-                "escalation": esc_score,
+                "classification": max(0.01, min(0.99, float(cls_score))),
+                "reply": max(0.01, min(0.99, float(reply_score))),
+                "escalation": max(0.01, min(0.99, float(esc_score))),
             },
             "\n".join(feedback_parts),
         )

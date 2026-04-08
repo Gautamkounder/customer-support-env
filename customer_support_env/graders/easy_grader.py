@@ -122,6 +122,7 @@ class EasyGrader:
         )
         # OpenEnv strict requirement: (0, 1) exclusive
         score = max(0.01, min(0.99, score))
+        breakdown = {k: max(0.01, min(0.99, float(v))) for k, v in breakdown.items()}
         
         feedback = "\n".join(feedback_parts)
         return round(score, 4), breakdown, feedback
