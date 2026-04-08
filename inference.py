@@ -313,18 +313,20 @@ def run_easy_task(env: "CustomerSupportEnv") -> List[float]:
             # Fallback must be > 0.0 for OpenEnv
             reward_delta, reward_cum, done = 0.01, 0.01, True
 
-        scores.append(reward_cum)
+        safe_score = max(0.01, min(0.99, float(reward_cum)))
+        scores.append(safe_score)
+        safe_delta = max(0.01, min(0.99, float(reward_delta)))
         log_step(
             task_id=task_id,
             ticket_id=tid,
             step=1,
             max_steps=1,
-            reward=reward_delta,
+            reward=safe_delta,
             done=done,
         )
 
     total = sum(scores)
-    avg   = total / len(scores) if scores else 0.0
+    avg   = max(0.01, min(0.99, total / len(scores))) if scores else 0.01
     log_end(task_id, total, avg, len(scores))
     return scores
 
@@ -376,15 +378,17 @@ def run_medium_task(env: "CustomerSupportEnv") -> List[float]:
             # Fallback must be > 0.0 for OpenEnv
             reward_delta, reward_cum, done = 0.01, 0.01, True
 
-        scores.append(reward_cum)
+        safe_score = max(0.01, min(0.99, float(reward_cum)))
+        scores.append(safe_score)
+        safe_delta = max(0.01, min(0.99, float(reward_delta)))
         log_step(
             task_id=task_id, ticket_id=tid,
             step=2, max_steps=2,
-            reward=reward_delta, done=done,
+            reward=safe_delta, done=done,
         )
 
     total = sum(scores)
-    avg   = total / len(scores) if scores else 0.0
+    avg   = max(0.01, min(0.99, total / len(scores))) if scores else 0.01
     log_end(task_id, total, avg, len(scores))
     return scores
 
@@ -452,15 +456,17 @@ def run_hard_task(env: "CustomerSupportEnv") -> List[float]:
             traceback.print_exc(file=sys.stdout)
             reward_delta, reward_cum, done = 0.01, 0.01, True
 
-        scores.append(reward_cum)
+        safe_score = max(0.01, min(0.99, float(reward_cum)))
+        scores.append(safe_score)
+        safe_delta = max(0.01, min(0.99, float(reward_delta)))
         log_step(
             task_id=task_id, ticket_id=tid,
             step=3, max_steps=3,
-            reward=reward_delta, done=done,
+            reward=safe_delta, done=done,
         )
 
     total = sum(scores)
-    avg   = total / len(scores) if scores else 0.01
+    avg   = max(0.01, min(0.99, total / len(scores))) if scores else 0.01
     log_end(task_id, total, avg, len(scores))
     return scores
 
