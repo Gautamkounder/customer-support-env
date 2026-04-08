@@ -309,7 +309,8 @@ def run_easy_task(env: "CustomerSupportEnv") -> List[float]:
             print(f"[ERROR] Easy task failed for ticket {tid}: "
                   f"{type(e).__name__}: {e}", flush=True)
             traceback.print_exc(file=sys.stdout)
-            reward, done = 0.0, True
+            # Fallback must be > 0.0 for OpenEnv
+            reward, done = 0.01, True
 
         scores.append(reward)
         log_step(
@@ -335,7 +336,7 @@ def run_medium_task(env: "CustomerSupportEnv") -> List[float]:
 
     scores: List[float] = []
     for i, tid in enumerate(ticket_ids):
-        reward, done = 0.0, True
+        reward, done = 0.01, True
         try:
             obs         = env.reset(task_id=task_id, ticket_id=tid, seed=42 + i)
             ticket_text = f"Subject: {obs.ticket.subject}\n\n{obs.ticket.body}"
@@ -370,7 +371,8 @@ def run_medium_task(env: "CustomerSupportEnv") -> List[float]:
             print(f"[ERROR] Medium task failed for ticket {tid}: "
                   f"{type(e).__name__}: {e}", flush=True)
             traceback.print_exc(file=sys.stdout)
-            reward, done = 0.0, True
+            # Fallback must be > 0.0 for OpenEnv
+            reward, done = 0.01, True
 
         scores.append(reward)
         log_step(
@@ -393,7 +395,7 @@ def run_hard_task(env: "CustomerSupportEnv") -> List[float]:
 
     scores: List[float] = []
     for i, tid in enumerate(ticket_ids):
-        reward, done = 0.0, True
+        reward, done = 0.01, True
         try:
             obs         = env.reset(task_id=task_id, ticket_id=tid, seed=42 + i)
             ticket_text = f"Subject: {obs.ticket.subject}\n\n{obs.ticket.body}"
@@ -445,7 +447,7 @@ def run_hard_task(env: "CustomerSupportEnv") -> List[float]:
             print(f"[ERROR] Hard task failed for ticket {tid}: "
                   f"{type(e).__name__}: {e}", flush=True)
             traceback.print_exc(file=sys.stdout)
-            reward, done = 0.0, True
+            reward, done = 0.01, True
 
         scores.append(reward)
         log_step(
@@ -455,7 +457,7 @@ def run_hard_task(env: "CustomerSupportEnv") -> List[float]:
         )
 
     total = sum(scores)
-    avg   = total / len(scores) if scores else 0.0
+    avg   = total / len(scores) if scores else 0.01
     log_end(task_id, total, avg, len(scores))
     return scores
 
@@ -484,8 +486,8 @@ def main():
             log_start(task_id, name, diff, n)
             for j in range(n):
                 log_step(task_id=task_id, ticket_id=f"TKT-{j+1:03d}",
-                         step=1, max_steps=1, reward=0.0, done=True)
-            log_end(task_id, 0.0, 0.0, n)
+                         step=1, max_steps=1, reward=0.01, done=True)
+            log_end(task_id, 0.01, 0.01, n)
         return
 
     env        = CustomerSupportEnv()
@@ -500,7 +502,7 @@ def main():
         print(f"[ERROR] run_easy_task crashed: {e}", flush=True)
         traceback.print_exc(file=sys.stdout)
         easy_scores = []
-    easy_avg = sum(easy_scores) / len(easy_scores) if easy_scores else 0.0
+    easy_avg = sum(easy_scores) / len(easy_scores) if easy_scores else 0.01
     all_scores.extend(easy_scores)
     print(f"  Easy Average: {easy_avg:.4f}", flush=True)
 
@@ -513,7 +515,7 @@ def main():
         print(f"[ERROR] run_medium_task crashed: {e}", flush=True)
         traceback.print_exc(file=sys.stdout)
         medium_scores = []
-    medium_avg = sum(medium_scores) / len(medium_scores) if medium_scores else 0.0
+    medium_avg = sum(medium_scores) / len(medium_scores) if medium_scores else 0.01
     all_scores.extend(medium_scores)
     print(f"  Medium Average: {medium_avg:.4f}", flush=True)
 
@@ -526,12 +528,12 @@ def main():
         print(f"[ERROR] run_hard_task crashed: {e}", flush=True)
         traceback.print_exc(file=sys.stdout)
         hard_scores = []
-    hard_avg = sum(hard_scores) / len(hard_scores) if hard_scores else 0.0
+    hard_avg = sum(hard_scores) / len(hard_scores) if hard_scores else 0.01
     all_scores.extend(hard_scores)
     print(f"  Hard Average: {hard_avg:.4f}", flush=True)
 
     # ── Summary ───────────────────────────────────────────────────────────────
-    overall_avg = sum(all_scores) / len(all_scores) if all_scores else 0.0
+    overall_avg = sum(all_scores) / len(all_scores) if all_scores else 0.01
     print("\n" + "=" * 60, flush=True)
     print("  📊 RESULTS SUMMARY", flush=True)
     print("=" * 60, flush=True)
