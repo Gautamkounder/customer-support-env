@@ -234,8 +234,18 @@ class CustomerSupportEnv:
 
         # Penalize clearly empty/no-op actions
         if self._is_empty_action(action):
-            reward = max(0.0, reward - 0.1)
+            reward = reward - 0.1
             feedback += "\n⚠️ Penalty: empty action detected (-0.1)"
+
+        # Enforce OpenEnv strictly (0, 1) bounds on the final cumulative score
+        if self._state.done:
+            projected_total = self._state.cumulative_reward + reward
+            clamped_total = max(0.01, min(0.99, projected_total))
+            # Adjust the current step's reward so the sum matches clamped_total
+            reward = clamped_total - self._state.cumulative_reward
+        else:
+            # For intermediate steps, just ensure it doesn't drop below 0
+            reward = max(0.0, reward)
 
         self._step_rewards.append(reward)
         self._step_feedbacks.append(feedback)

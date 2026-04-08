@@ -175,6 +175,8 @@ class HardGrader:
             + reply_score * cls.REPLY_WEIGHT
             + esc_score * cls.ESCALATION_WEIGHT
         )
+        # OpenEnv strict requirement: (0, 1) exclusive
+        total = max(0.01, min(0.99, total))
 
         return (
             round(total, 4),

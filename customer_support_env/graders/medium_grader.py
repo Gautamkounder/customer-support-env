@@ -168,6 +168,8 @@ class MediumGrader:
         feedback_parts.append(reply_feedback)
 
         total = cls_score * cls.CLASSIFICATION_WEIGHT + reply_score * cls.REPLY_WEIGHT
+        # OpenEnv strict requirement: (0, 1) exclusive
+        total = max(0.01, min(0.99, total))
         return round(total, 4), {"classification": cls_score, "reply": reply_score}, "\n".join(feedback_parts)
 
     @staticmethod

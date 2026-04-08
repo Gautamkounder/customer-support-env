@@ -120,5 +120,8 @@ class EasyGrader:
             + breakdown["priority"] * cls.PRIORITY_WEIGHT
             + breakdown["sentiment"] * cls.SENTIMENT_WEIGHT
         )
+        # OpenEnv strict requirement: (0, 1) exclusive
+        score = max(0.01, min(0.99, score))
+        
         feedback = "\n".join(feedback_parts)
         return round(score, 4), breakdown, feedback
