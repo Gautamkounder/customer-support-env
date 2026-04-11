@@ -557,10 +557,10 @@ def main():
     results = {
         "model":            MODEL_NAME,
         "api_base_url":     API_BASE_URL,
-        "easy_classify":    {"scores": easy_scores,   "average": round(easy_avg, 4)},
-        "medium_reply":     {"scores": medium_scores,  "average": round(medium_avg, 4)},
-        "hard_resolution":  {"scores": hard_scores,    "average": round(hard_avg, 4)},
-        "overall_average":  round(overall_avg, 4),
+        "easy_classify":    {"scores": easy_scores,   "average": easy_avg},
+        "medium_reply":     {"scores": medium_scores,  "average": medium_avg},
+        "hard_resolution":  {"scores": hard_scores,    "average": hard_avg},
+        "overall_average":  overall_avg,
     }
     try:
         os.makedirs("outputs", exist_ok=True)
