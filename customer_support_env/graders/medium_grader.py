@@ -124,7 +124,7 @@ class MediumGrader:
         w_total = sum(weights.values())
         score = sum(breakdown[k] * weights[k] / w_total for k in weights if k in breakdown)
 
-        return round(score, 4), breakdown, "\n".join(feedback_parts)
+        return score, breakdown, "\n".join(feedback_parts)
 
     @classmethod
     def grade(
@@ -162,7 +162,7 @@ class MediumGrader:
             "classification": max(1e-6, min(1 - 1e-6, float(cls_score))),
             "reply": max(1e-6, min(1 - 1e-6, float(reply_score)))
         }
-        return round(total, 4), breakdown, "\n".join(feedback_parts)
+        return total, breakdown, "\n".join(feedback_parts)
 
     @staticmethod
     def _check_resolution_points(reply: str, points: List[str]) -> int:

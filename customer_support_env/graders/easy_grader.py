@@ -125,4 +125,4 @@ class EasyGrader:
         breakdown = {k: max(1e-6, min(1 - 1e-6, float(v))) for k, v in breakdown.items()}
         
         feedback = "\n".join(feedback_parts)
-        return round(score, 4), breakdown, feedback
+        return score, breakdown, feedback
