@@ -132,7 +132,7 @@ class HardGrader:
             for k in weights
         )
 
-        return score, breakdown, "\n".join(feedback_parts)
+        return round(score, 4), breakdown, "\n".join(feedback_parts)
 
     @classmethod
     def grade(

@@ -1,4 +1,7 @@
-
+"""
+Medium Grader — scores classify + reply task.
+All scores strictly in open interval (0, 1) — never 0.0 or 1.0.
+"""
 
 from __future__ import annotations
 
@@ -6,7 +9,7 @@ import re
 from typing import Dict, List, Optional, Tuple
 
 from ..models import CustomerSupportAction, CustomerTicket
-from .easy_grader import EasyGrader
+from .easy_grader import EasyGrader, _clamp, _MIN, _MAX
 
 
 class MediumGrader:
@@ -31,32 +34,33 @@ class MediumGrader:
         feedback_parts = []
 
         if not reply or not reply.strip():
-            return 0.0, {"reply_provided": 0.0}, "❌ No reply provided"
+            # Return _MIN not 0.0 — strict (0,1) requirement
+            return _MIN, {"reply_provided": _MIN}, "X No reply provided"
 
         reply_lower = reply.lower()
 
-        # ── Has reply ──
-        breakdown["reply_provided"] = 1.0
-        feedback_parts.append("✅ Reply provided")
+        # -- Has reply --
+        breakdown["reply_provided"] = _MAX
+        feedback_parts.append("OK Reply provided")
 
-        # ── Minimum length ──
+        # -- Minimum length --
         if len(reply.strip()) >= 50:
-            breakdown["min_length"] = 1.0
-            feedback_parts.append(f"✅ Reply length adequate ({len(reply.strip())} chars)")
+            breakdown["min_length"] = _MAX
+            feedback_parts.append(f"OK Reply length adequate ({len(reply.strip())} chars)")
         else:
-            breakdown["min_length"] = 0.0
-            feedback_parts.append(f"❌ Reply too short ({len(reply.strip())} chars, need 50+)")
+            breakdown["min_length"] = _MIN
+            feedback_parts.append(f"X Reply too short ({len(reply.strip())} chars, need 50+)")
 
-        # ── Customer name ──
+        # -- Customer name --
         first_name = ticket.customer_name.split()[0].lower()
         if first_name in reply_lower:
-            breakdown["uses_name"] = 1.0
-            feedback_parts.append("✅ Addresses customer by name")
+            breakdown["uses_name"] = _MAX
+            feedback_parts.append("OK Addresses customer by name")
         else:
-            breakdown["uses_name"] = 0.0
-            feedback_parts.append("❌ Does not address customer by name")
+            breakdown["uses_name"] = _MIN
+            feedback_parts.append("X Does not address customer by name")
 
-        # ── Professional tone ──
+        # -- Professional tone --
         caps_ratio = sum(1 for c in reply if c.isupper()) / max(len(reply), 1)
         rude_patterns = [
             r"\byour fault\b", r"\byou should have\b", r"\bnot my problem\b",
@@ -64,17 +68,16 @@ class MediumGrader:
         ]
         is_rude = any(re.search(p, reply_lower) for p in rude_patterns)
         if caps_ratio < 0.4 and not is_rude:
-            breakdown["professional_tone"] = 1.0
-            feedback_parts.append("✅ Professional tone")
+            breakdown["professional_tone"] = _MAX
+            feedback_parts.append("OK Professional tone")
         else:
-            breakdown["professional_tone"] = 0.0
+            breakdown["professional_tone"] = _MIN
             reason = "excessive caps" if caps_ratio >= 0.4 else "unprofessional language"
-            feedback_parts.append(f"❌ Tone issue: {reason}")
+            feedback_parts.append(f"X Tone issue: {reason}")
 
-        # ── References specifics ──
+        # -- References specifics --
         specifics_found = 0
         specifics_total = 0
-        # Check for order numbers, tracking numbers, error codes, account IDs
         specific_patterns = re.findall(
             r'(?:order|#|TKT|TRK|ACC|ENT|req_|error)\s*[-#]?\s*\w+',
             ticket.body,
@@ -83,48 +86,48 @@ class MediumGrader:
         if specific_patterns:
             specifics_total = min(len(specific_patterns), 3)
             for pattern in specific_patterns[:3]:
-                # Extract the key identifier
                 key = re.findall(r'[A-Z]*[-#]?\d+\w*', pattern)
                 if key and any(k.lower() in reply_lower for k in key):
                     specifics_found += 1
         if specifics_total > 0:
-            breakdown["references_specifics"] = specifics_found / specifics_total
+            raw_ratio = specifics_found / specifics_total
+            breakdown["references_specifics"] = _clamp(raw_ratio)
             feedback_parts.append(
-                f"{'✅' if specifics_found == specifics_total else '⚠️'} "
+                f"{'OK' if specifics_found == specifics_total else '~~'} "
                 f"References specifics: {specifics_found}/{specifics_total}"
             )
         else:
-            breakdown["references_specifics"] = 1.0  # No specifics to check
-            feedback_parts.append("✅ No specific references needed")
+            breakdown["references_specifics"] = _MAX
+            feedback_parts.append("OK No specific references needed")
 
-        # ── Resolution points coverage ──
+        # -- Resolution points coverage --
         if ticket.expected_resolution_points:
             points_hit = cls._check_resolution_points(
                 reply, ticket.expected_resolution_points
             )
             total_points = len(ticket.expected_resolution_points)
-            breakdown["resolution_points"] = points_hit / total_points
+            raw_ratio = points_hit / total_points
+            breakdown["resolution_points"] = _clamp(raw_ratio)
             feedback_parts.append(
-                f"{'✅' if points_hit == total_points else '⚠️'} "
+                f"{'OK' if points_hit == total_points else '~~'} "
                 f"Resolution points: {points_hit}/{total_points}"
             )
         else:
-            breakdown["resolution_points"] = 1.0
+            breakdown["resolution_points"] = _MAX
 
         # Weighted score
         weights = {
-            "reply_provided": 0.10 / cls.REPLY_WEIGHT,
-            "min_length": 0.10 / cls.REPLY_WEIGHT,
-            "uses_name": 0.05 / cls.REPLY_WEIGHT,
-            "professional_tone": 0.10 / cls.REPLY_WEIGHT,
+            "reply_provided":       0.10 / cls.REPLY_WEIGHT,
+            "min_length":           0.10 / cls.REPLY_WEIGHT,
+            "uses_name":            0.05 / cls.REPLY_WEIGHT,
+            "professional_tone":    0.10 / cls.REPLY_WEIGHT,
             "references_specifics": 0.15 / cls.REPLY_WEIGHT,
-            "resolution_points": 0.20 / cls.REPLY_WEIGHT,
+            "resolution_points":    0.20 / cls.REPLY_WEIGHT,
         }
-        # Normalize weights to sum to 1
         w_total = sum(weights.values())
         score = sum(breakdown[k] * weights[k] / w_total for k in weights if k in breakdown)
 
-        return score, breakdown, "\n".join(feedback_parts)
+        return round(_clamp(score), 4), {k: _clamp(v) for k, v in breakdown.items()}, "\n".join(feedback_parts)
 
     @classmethod
     def grade(
@@ -133,7 +136,7 @@ class MediumGrader:
         reply_action: Optional[CustomerSupportAction],
         ticket: CustomerTicket,
     ) -> Tuple[float, Dict[str, float], str]:
-        """Grade the full medium task."""
+        """Grade the full medium task. All scores strictly in (0, 1)."""
         feedback_parts = []
 
         # Classification
@@ -144,8 +147,8 @@ class MediumGrader:
             feedback_parts.append("=== Classification ===")
             feedback_parts.append(cls_feedback)
         else:
-            cls_score = 0.0
-            feedback_parts.append("=== Classification ===\n❌ No classification provided")
+            cls_score = _MIN
+            feedback_parts.append("=== Classification ===\nX No classification provided")
 
         # Reply
         reply_text = reply_action.draft_reply if reply_action else None
@@ -157,12 +160,12 @@ class MediumGrader:
 
         total = cls_score * cls.CLASSIFICATION_WEIGHT + reply_score * cls.REPLY_WEIGHT
         # OpenEnv strict requirement: (0, 1) exclusive
-        total = max(1e-6, min(1 - 1e-6, total))
+        total = _clamp(total)
         breakdown = {
-            "classification": max(1e-6, min(1 - 1e-6, float(cls_score))),
-            "reply": max(1e-6, min(1 - 1e-6, float(reply_score)))
+            "classification": _clamp(cls_score),
+            "reply":          _clamp(reply_score),
         }
-        return total, breakdown, "\n".join(feedback_parts)
+        return round(total, 4), breakdown, "\n".join(feedback_parts)
 
     @staticmethod
     def _check_resolution_points(reply: str, points: List[str]) -> int:
@@ -175,7 +178,6 @@ class MediumGrader:
         hits = 0
         for point in points:
             point_words = set(re.findall(r'\w+', point.lower()))
-            # Remove very common words
             stop_words = {
                 "the", "a", "an", "and", "or", "to", "for", "of", "in",
                 "is", "it", "that", "this", "with", "be", "on", "at",
@@ -186,7 +188,6 @@ class MediumGrader:
             if not key_words:
                 hits += 1
                 continue
-            # Need at least 40% of key words present
             matched = sum(1 for w in key_words if w in reply_words)
             if matched / len(key_words) >= 0.4:
                 hits += 1

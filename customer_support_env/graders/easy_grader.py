@@ -1,14 +1,14 @@
 """
 Easy Grader — scores ticket classification accuracy.
 
-Scoring (0.0 – 1.0):
-  • Category match:  0.40
-  • Priority match:  0.30
-  • Sentiment match: 0.30
+Scoring strictly in open interval (0, 1) — never 0.0 or 1.0.
+  - Category match:  0.40
+  - Priority match:  0.30
+  - Sentiment match: 0.30
 
 Partial credit for "close" answers:
-  - Priority off by one level → half credit
-  - Sentiment confusion between neutral↔negative → half credit
+  - Priority off by one level -> half credit
+  - Sentiment confusion between neutral<->negative -> half credit
 """
 
 from __future__ import annotations
@@ -38,6 +38,15 @@ SENTIMENT_ADJACENCY = {
     (TicketSentiment.ANGRY, TicketSentiment.NEGATIVE): 0.5,
 }
 
+# OpenEnv strict bounds: all scores must be in open interval (0, 1)
+_MIN = 1e-6
+_MAX = 1 - 1e-6
+
+
+def _clamp(v: float) -> float:
+    """Clamp value to strict open interval (0, 1)."""
+    return max(_MIN, min(_MAX, float(v)))
+
 
 class EasyGrader:
     """Deterministic grader for easy (classification) task."""
@@ -52,66 +61,68 @@ class EasyGrader:
     ) -> Tuple[float, Dict[str, float], str]:
         """
         Returns (score, breakdown, feedback).
+        All scores strictly in (0, 1) - never 0.0 or 1.0.
         """
         breakdown: Dict[str, float] = {}
         feedback_parts = []
 
-        # ── Category ──
+        # -- Category --
         if action.classify_category is None:
-            breakdown["category"] = 0.0
-            feedback_parts.append("❌ Category: not provided")
+            breakdown["category"] = _MIN
+            feedback_parts.append("X Category: not provided")
         elif action.classify_category == ticket.true_category:
-            breakdown["category"] = 1.0
-            feedback_parts.append(f"✅ Category: correct ({ticket.true_category.value})")
+            breakdown["category"] = _MAX
+            feedback_parts.append(f"OK Category: correct ({ticket.true_category.value})")
         else:
-            breakdown["category"] = 0.0
+            breakdown["category"] = _MIN
             feedback_parts.append(
-                f"❌ Category: {action.classify_category.value} "
+                f"X Category: {action.classify_category.value} "
                 f"(expected {ticket.true_category.value})"
             )
 
-        # ── Priority ──
+        # -- Priority --
         if action.classify_priority is None:
-            breakdown["priority"] = 0.0
-            feedback_parts.append("❌ Priority: not provided")
+            breakdown["priority"] = _MIN
+            feedback_parts.append("X Priority: not provided")
         elif action.classify_priority == ticket.true_priority:
-            breakdown["priority"] = 1.0
-            feedback_parts.append(f"✅ Priority: correct ({ticket.true_priority.value})")
+            breakdown["priority"] = _MAX
+            feedback_parts.append(f"OK Priority: correct ({ticket.true_priority.value})")
         else:
             pred_idx = PRIORITY_ORDER.index(action.classify_priority)
             true_idx = PRIORITY_ORDER.index(ticket.true_priority)
             if abs(pred_idx - true_idx) == 1:
                 breakdown["priority"] = 0.5
                 feedback_parts.append(
-                    f"⚠️ Priority: {action.classify_priority.value} "
+                    f"~~ Priority: {action.classify_priority.value} "
                     f"(expected {ticket.true_priority.value}, partial credit)"
                 )
             else:
-                breakdown["priority"] = 0.0
+                breakdown["priority"] = _MIN
                 feedback_parts.append(
-                    f"❌ Priority: {action.classify_priority.value} "
+                    f"X Priority: {action.classify_priority.value} "
                     f"(expected {ticket.true_priority.value})"
                 )
 
-        # ── Sentiment ──
+        # -- Sentiment --
         if action.classify_sentiment is None:
-            breakdown["sentiment"] = 0.0
-            feedback_parts.append("❌ Sentiment: not provided")
+            breakdown["sentiment"] = _MIN
+            feedback_parts.append("X Sentiment: not provided")
         elif action.classify_sentiment == ticket.true_sentiment:
-            breakdown["sentiment"] = 1.0
-            feedback_parts.append(f"✅ Sentiment: correct ({ticket.true_sentiment.value})")
+            breakdown["sentiment"] = _MAX
+            feedback_parts.append(f"OK Sentiment: correct ({ticket.true_sentiment.value})")
         else:
             pair = (action.classify_sentiment, ticket.true_sentiment)
-            partial = SENTIMENT_ADJACENCY.get(pair, 0.0)
-            breakdown["sentiment"] = partial
-            if partial > 0:
+            partial = SENTIMENT_ADJACENCY.get(pair, _MIN)
+            # Ensure partial is never exactly 0.0
+            breakdown["sentiment"] = partial if partial > _MIN else _MIN
+            if partial > _MIN:
                 feedback_parts.append(
-                    f"⚠️ Sentiment: {action.classify_sentiment.value} "
+                    f"~~ Sentiment: {action.classify_sentiment.value} "
                     f"(expected {ticket.true_sentiment.value}, partial credit)"
                 )
             else:
                 feedback_parts.append(
-                    f"❌ Sentiment: {action.classify_sentiment.value} "
+                    f"X Sentiment: {action.classify_sentiment.value} "
                     f"(expected {ticket.true_sentiment.value})"
                 )
 
@@ -120,9 +131,10 @@ class EasyGrader:
             + breakdown["priority"] * cls.PRIORITY_WEIGHT
             + breakdown["sentiment"] * cls.SENTIMENT_WEIGHT
         )
-        # OpenEnv strict requirement: (0, 1) exclusive
-        score = max(1e-6, min(1 - 1e-6, score))
-        breakdown = {k: max(1e-6, min(1 - 1e-6, float(v))) for k, v in breakdown.items()}
-        
+
+        # OpenEnv strict requirement: (0, 1) exclusive - clamp everything
+        score = _clamp(score)
+        breakdown = {k: _clamp(v) for k, v in breakdown.items()}
+
         feedback = "\n".join(feedback_parts)
-        return score, breakdown, feedback
+        return round(score, 4), breakdown, feedback
