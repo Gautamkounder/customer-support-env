@@ -213,7 +213,7 @@ class CustomerSupportEnv:
                 reward = reply_score * HardGrader.REPLY_WEIGHT
                 feedback = reply_fb
                 info["step_type"] = "reply"
-                info["reply_score"] = max(1e-6, min(1 - 1e-6, float(reply_score)))
+                info["reply_score"] = max(0.0001, min(0.9999, float(reply_score)))
             elif step_idx == 2:
                 # Escalation + final grading
                 r_full, breakdown, feedback = HardGrader.grade(
@@ -240,7 +240,7 @@ class CustomerSupportEnv:
         # Enforce OpenEnv strictly (0, 1) bounds on the final cumulative score
         if self._state.done:
             projected_total = self._state.cumulative_reward + reward
-            clamped_total = max(1e-6, min(1 - 1e-6, projected_total))
+            clamped_total = max(0.0001, min(0.9999, projected_total))
             # Adjust the current step's reward so the sum matches clamped_total
             reward = clamped_total - self._state.cumulative_reward
         else:
@@ -277,7 +277,7 @@ class CustomerSupportEnv:
 
         # Clamp step reward to strict (0, 1) after rounding
         step_reward = round(reward, 4)
-        step_reward = max(1e-6, min(1 - 1e-6, step_reward))
+        step_reward = max(0.0001, min(0.9999, step_reward))
 
         return StepResult(
             observation=obs,
