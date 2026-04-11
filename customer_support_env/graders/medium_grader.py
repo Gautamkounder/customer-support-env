@@ -1,16 +1,4 @@
-"""
-Medium Grader — scores classification + reply quality.
 
-Overall scoring:
-  • Classification accuracy:  0.30  (same formula as EasyGrader)
-  • Reply quality:            0.70
-    - Has reply at all:       0.10
-    - Minimum length (50+ chars): 0.10
-    - Addresses customer by name: 0.05
-    - Professional tone (no ALL CAPS, no rudeness indicators): 0.10
-    - References ticket specifics (order #, error, etc.): 0.15
-    - Covers expected resolution points: 0.20
-"""
 
 from __future__ import annotations
 
@@ -169,10 +157,10 @@ class MediumGrader:
 
         total = cls_score * cls.CLASSIFICATION_WEIGHT + reply_score * cls.REPLY_WEIGHT
         # OpenEnv strict requirement: (0, 1) exclusive
-        total = max(0.01, min(0.99, total))
+        total = max(1e-6, min(1 - 1e-6, total))
         breakdown = {
-            "classification": max(0.01, min(0.99, float(cls_score))),
-            "reply": max(0.01, min(0.99, float(reply_score)))
+            "classification": max(1e-6, min(1 - 1e-6, float(cls_score))),
+            "reply": max(1e-6, min(1 - 1e-6, float(reply_score)))
         }
         return round(total, 4), breakdown, "\n".join(feedback_parts)
 

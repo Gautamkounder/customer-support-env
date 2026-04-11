@@ -176,14 +176,14 @@ class HardGrader:
             + esc_score * cls.ESCALATION_WEIGHT
         )
         # OpenEnv strict requirement: (0, 1) exclusive
-        total = max(0.01, min(0.99, total))
+        total = max(1e-6, min(1 - 1e-6, total))
 
         return (
             round(total, 4),
             {
-                "classification": max(0.01, min(0.99, float(cls_score))),
-                "reply": max(0.01, min(0.99, float(reply_score))),
-                "escalation": max(0.01, min(0.99, float(esc_score))),
+                "classification": max(1e-6, min(1 - 1e-6, float(cls_score))),
+                "reply": max(1e-6, min(1 - 1e-6, float(reply_score))),
+                "escalation": max(1e-6, min(1 - 1e-6, float(esc_score))),
             },
             "\n".join(feedback_parts),
         )
