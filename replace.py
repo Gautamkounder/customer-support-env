@@ -12,8 +12,8 @@ for f in files:
     with open(f, "r", encoding="utf-8") as file:
         content = file.read()
         
-    content = content.replace("1 - 1e-6", "0.9999")
-    content = content.replace("1e-6", "0.0001")
+    content = content.replace("1 - 0.001", "0.9999")
+    content = content.replace("0.001", "0.0001")
     
     with open(f, "w", encoding="utf-8") as file:
         file.write(content)

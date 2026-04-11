@@ -108,7 +108,7 @@ class CustomerSupportEnv:
             step_count=0,
             max_steps=task_cls.max_steps,
             done=False,
-            cumulative_reward=0.0,
+            cumulative_reward=0.001,
             ticket_id=self._current_ticket.ticket_id,
         )
         self._actions = []
@@ -130,7 +130,7 @@ class CustomerSupportEnv:
             step_count=0,
             max_steps=task_cls.max_steps,
             done=False,
-            reward=0.0,
+            reward=0.001,
             feedback=None,
             metadata={
                 "task_id": task_id,
@@ -158,8 +158,8 @@ class CustomerSupportEnv:
         step_idx = self._state.step_count - 1  # 0-indexed
         is_last_step = self._state.step_count >= self._state.max_steps
 
-        # Grade based on task type
-        reward = 0.0
+        # Grade based on task type — initialize to _MIN as safety net
+        reward = 0.001
         feedback = ""
         info: Dict[str, Any] = {}
 
@@ -213,7 +213,7 @@ class CustomerSupportEnv:
                 reward = reply_score * HardGrader.REPLY_WEIGHT
                 feedback = reply_fb
                 info["step_type"] = "reply"
-                info["reply_score"] = max(1e-6, min(1 - 1e-6, float(reply_score)))
+                info["reply_score"] = max(0.001, min(1 - 0.001, float(reply_score)))
             elif step_idx == 2:
                 # Escalation + final grading
                 r_full, breakdown, feedback = HardGrader.grade(
@@ -237,19 +237,17 @@ class CustomerSupportEnv:
             reward = reward - 0.1
             feedback += "\n⚠️ Penalty: empty action detected (-0.1)"
 
-        # Enforce OpenEnv strictly (0, 1) bounds on the final cumulative score
-        if self._state.done:
-            projected_total = self._state.cumulative_reward + reward
-            clamped_total = max(1e-6, min(1 - 1e-6, projected_total))
-            # Adjust the current step's reward so the sum matches clamped_total
-            reward = clamped_total - self._state.cumulative_reward
-        else:
-            # For intermediate steps, just ensure it doesn't drop below 0
-            reward = max(0.0, reward)
+        # Enforce OpenEnv strictly (0, 1) bounds — cumulative must ALWAYS be in (0, 1)
+        projected_total = self._state.cumulative_reward + reward
+        clamped_total = max(0.001, min(1 - 0.001, projected_total))
+        # Adjust the current step's reward so cumulative matches clamped_total
+        reward = clamped_total - self._state.cumulative_reward
+        # Ensure step reward itself is non-negative (can't un-give rewards)
+        reward = max(0.0, reward)
 
         self._step_rewards.append(reward)
         self._step_feedbacks.append(feedback)
-        self._state.cumulative_reward += reward
+        self._state.cumulative_reward = max(0.001, min(1 - 0.001, self._state.cumulative_reward + reward))
 
         # Build next observation
         next_description = ""
@@ -275,8 +273,9 @@ class CustomerSupportEnv:
             },
         )
 
-        # Clamp step reward to strict (0, 1)
-        step_reward = max(1e-6, min(1 - 1e-6, float(reward)))
+        # Clamp step reward to strict (0, 1) after rounding
+        step_reward = float(reward)
+        step_reward = max(0.001, min(1 - 0.001, step_reward))
 
         return StepResult(
             observation=obs,

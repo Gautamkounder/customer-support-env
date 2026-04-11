@@ -39,8 +39,8 @@ SENTIMENT_ADJACENCY = {
 }
 
 # OpenEnv strict bounds: all scores must be in open interval (0, 1)
-_MIN = 1e-6
-_MAX = 1 - 1e-6
+_MIN = 0.001
+_MAX = 1 - 0.001
 
 
 def _clamp(v: float) -> float:

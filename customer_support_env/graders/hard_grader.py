@@ -1,10 +1,11 @@
 """
 Hard Grader — scores classification + reply + escalation decision.
+All scores strictly in open interval (0, 1) — never 0.0 or 1.0.
 
 Overall scoring:
-  • Classification accuracy:   0.20
-  • Reply quality:             0.45
-  • Escalation decision:       0.35
+  - Classification accuracy:   0.20
+  - Reply quality:             0.45
+  - Escalation decision:       0.35
     - Correct escalation yes/no: 0.15
     - Appropriate level:         0.10
     - Reason quality:            0.10
@@ -41,7 +42,8 @@ class HardGrader:
         feedback_parts = []
 
         if action is None:
-            return 0.0, {"escalation_decision": 0.0}, "❌ No escalation action provided"
+            # Return _MIN not 0.0 — strict (0,1) requirement
+            return _MIN, {"escalation_decision": _MIN}, "X No escalation action provided"
 
         requires = ticket.requires_escalation or False
         agent_escalates = (
@@ -49,90 +51,80 @@ class HardGrader:
             and action.escalation_level != EscalationLevel.NONE
         )
 
-        # ── Correct decision ──
+        # -- Correct decision --
         if requires == agent_escalates:
-            breakdown["correct_decision"] = 1.0
+            breakdown["correct_decision"] = _MAX
             feedback_parts.append(
-                f"✅ Escalation decision correct "
+                f"OK Escalation decision correct "
                 f"({'escalated' if agent_escalates else 'not escalated'})"
             )
         else:
-            breakdown["correct_decision"] = 0.0
+            breakdown["correct_decision"] = _MIN
             if requires and not agent_escalates:
-                feedback_parts.append(
-                    "❌ Should have escalated this ticket but didn't"
-                )
+                feedback_parts.append("X Should have escalated this ticket but didn't")
             else:
-                feedback_parts.append(
-                    "❌ Escalated unnecessarily"
-                )
+                feedback_parts.append("X Escalated unnecessarily")
 
-        # ── Appropriate level ──
+        # -- Appropriate level --
         if agent_escalates and requires:
-            # Determine expected level based on ticket content
             expected_level = cls._infer_expected_level(ticket)
             if action.escalation_level == expected_level:
-                breakdown["appropriate_level"] = 1.0
-                feedback_parts.append(
-                    f"✅ Escalation level correct ({expected_level.value})"
-                )
+                breakdown["appropriate_level"] = _MAX
+                feedback_parts.append(f"OK Escalation level correct ({expected_level.value})")
             elif cls._is_adjacent_level(action.escalation_level, expected_level):
                 breakdown["appropriate_level"] = 0.5
                 feedback_parts.append(
-                    f"⚠️ Escalation level close "
+                    f"~~ Escalation level close "
                     f"({action.escalation_level.value}, expected {expected_level.value})"
                 )
             else:
-                breakdown["appropriate_level"] = 0.0
+                breakdown["appropriate_level"] = _MIN
                 feedback_parts.append(
-                    f"❌ Wrong escalation level "
+                    f"X Wrong escalation level "
                     f"({action.escalation_level.value}, expected {expected_level.value})"
                 )
         elif not requires and not agent_escalates:
-            breakdown["appropriate_level"] = 1.0  # Correctly didn't escalate
+            breakdown["appropriate_level"] = _MAX  # Correctly didn't escalate
         else:
-            breakdown["appropriate_level"] = 0.0
+            breakdown["appropriate_level"] = _MIN
 
-        # ── Reason quality ──
+        # -- Reason quality --
         if action.escalation_reason and len(action.escalation_reason.strip()) >= 20:
-            # Check if reason contains relevant keywords
             reason_lower = action.escalation_reason.lower()
             relevant_keywords = cls._get_escalation_keywords(ticket)
-            keyword_hits = sum(
-                1 for kw in relevant_keywords if kw in reason_lower
-            )
+            keyword_hits = sum(1 for kw in relevant_keywords if kw in reason_lower)
             keyword_ratio = keyword_hits / max(len(relevant_keywords), 1)
-            breakdown["reason_quality"] = min(1.0, 0.5 + keyword_ratio * 0.5)
+            breakdown["reason_quality"] = _clamp(0.5 + keyword_ratio * 0.5)
             if keyword_ratio >= 0.3:
                 feedback_parts.append(
-                    f"✅ Escalation reason is well-justified ({keyword_hits} relevant points)"
+                    f"OK Escalation reason is well-justified ({keyword_hits} relevant points)"
                 )
             else:
-                feedback_parts.append(
-                    f"⚠️ Escalation reason could be more specific"
-                )
+                feedback_parts.append("~~ Escalation reason could be more specific")
         elif action.escalation_reason:
             breakdown["reason_quality"] = 0.3
-            feedback_parts.append("⚠️ Escalation reason too brief")
+            feedback_parts.append("~~ Escalation reason too brief")
         else:
-            breakdown["reason_quality"] = 0.0 if requires else 0.8
+            # requires=True  -> bad (no reason given): _MIN
+            # requires=False -> ok (no reason needed): 0.8
+            breakdown["reason_quality"] = _MIN if requires else 0.8
             if requires:
-                feedback_parts.append("❌ No escalation reason provided")
+                feedback_parts.append("X No escalation reason provided")
             else:
-                feedback_parts.append("✅ No escalation reason needed")
+                feedback_parts.append("OK No escalation reason needed")
 
         weights = {
-            "correct_decision": 0.15 / cls.ESCALATION_WEIGHT,
+            "correct_decision":  0.15 / cls.ESCALATION_WEIGHT,
             "appropriate_level": 0.10 / cls.ESCALATION_WEIGHT,
-            "reason_quality": 0.10 / cls.ESCALATION_WEIGHT,
+            "reason_quality":    0.10 / cls.ESCALATION_WEIGHT,
         }
         w_total = sum(weights.values())
         score = sum(
-            breakdown.get(k, 0) * weights[k] / w_total
+            breakdown.get(k, _MIN) * weights[k] / w_total
             for k in weights
         )
 
-        return _clamp(score), breakdown, "\n".join(feedback_parts)
+        return round(_clamp(score), 4), {k: _clamp(v) for k, v in breakdown.items()}, "\n".join(feedback_parts)
 
     @classmethod
     def grade(
@@ -142,31 +134,26 @@ class HardGrader:
         escalation_action: Optional[CustomerSupportAction],
         ticket: CustomerTicket,
     ) -> Tuple[float, Dict[str, float], str]:
+        """Grade the full hard task. All scores strictly in (0, 1)."""
         feedback_parts = []
 
         # Classification
         if classification_action:
-            cls_score, _, cls_feedback = EasyGrader.grade(
-                classification_action, ticket
-            )
+            cls_score, _, cls_feedback = EasyGrader.grade(classification_action, ticket)
             feedback_parts.append("=== Classification ===")
             feedback_parts.append(cls_feedback)
         else:
-            cls_score = 0.0
-            feedback_parts.append("=== Classification ===\n❌ Not provided")
+            cls_score = _MIN
+            feedback_parts.append("=== Classification ===\nX Not provided")
 
         # Reply
         reply_text = reply_action.draft_reply if reply_action else None
-        reply_score, _, reply_feedback = MediumGrader.grade_reply(
-            reply_text, ticket
-        )
+        reply_score, _, reply_feedback = MediumGrader.grade_reply(reply_text, ticket)
         feedback_parts.append("\n=== Reply Quality ===")
         feedback_parts.append(reply_feedback)
 
         # Escalation
-        esc_score, _, esc_feedback = cls.grade_escalation(
-            escalation_action, ticket
-        )
+        esc_score, _, esc_feedback = cls.grade_escalation(escalation_action, ticket)
         feedback_parts.append("\n=== Escalation Decision ===")
         feedback_parts.append(esc_feedback)
 
@@ -176,14 +163,14 @@ class HardGrader:
             + esc_score * cls.ESCALATION_WEIGHT
         )
         # OpenEnv strict requirement: (0, 1) exclusive
-        total = max(1e-6, min(1 - 1e-6, total))
+        total = _clamp(total)
 
         return (
-            _clamp(total),
+            float(total),
             {
-                "classification": max(1e-6, min(1 - 1e-6, float(cls_score))),
-                "reply": max(1e-6, min(1 - 1e-6, float(reply_score))),
-                "escalation": max(1e-6, min(1 - 1e-6, float(esc_score))),
+                "classification": _clamp(cls_score),
+                "reply":          _clamp(reply_score),
+                "escalation":     _clamp(esc_score),
             },
             "\n".join(feedback_parts),
         )
