@@ -20,7 +20,7 @@ from ..models import (
     CustomerTicket,
     EscalationLevel,
 )
-from .easy_grader import EasyGrader
+from .easy_grader import EasyGrader, _clamp, _MIN, _MAX
 from .medium_grader import MediumGrader
 
 

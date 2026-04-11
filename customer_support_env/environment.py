@@ -275,9 +275,8 @@ class CustomerSupportEnv:
             },
         )
 
-        # Clamp step reward to strict (0, 1) after rounding
-        step_reward = round(reward, 4)
-        step_reward = max(1e-6, min(1 - 1e-6, step_reward))
+        # Clamp step reward to strict (0, 1)
+        step_reward = max(1e-6, min(1 - 1e-6, float(reward)))
 
         return StepResult(
             observation=obs,

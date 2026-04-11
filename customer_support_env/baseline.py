@@ -281,8 +281,8 @@ def main():
     easy_avg = sum(easy_scores) / len(easy_scores) if easy_scores else 0
     results["easy_classify"] = {
         "scores": easy_scores,
-        "average": round(easy_avg, 4),
-        "time_seconds": round(time.time() - t0, 1),
+        "average": easy_avg,
+        "time_seconds": time.time() - t0,
     }
     overall_scores.extend(easy_scores)
     print(f"  Average: {easy_avg:.4f}")
@@ -295,8 +295,8 @@ def main():
     medium_avg = sum(medium_scores) / len(medium_scores) if medium_scores else 0
     results["medium_reply"] = {
         "scores": medium_scores,
-        "average": round(medium_avg, 4),
-        "time_seconds": round(time.time() - t0, 1),
+        "average": medium_avg,
+        "time_seconds": time.time() - t0,
     }
     overall_scores.extend(medium_scores)
     print(f"  Average: {medium_avg:.4f}")
@@ -309,8 +309,8 @@ def main():
     hard_avg = sum(hard_scores) / len(hard_scores) if hard_scores else 0
     results["hard_resolution"] = {
         "scores": hard_scores,
-        "average": round(hard_avg, 4),
-        "time_seconds": round(time.time() - t0, 1),
+        "average": hard_avg,
+        "time_seconds": time.time() - t0,
     }
     overall_scores.extend(hard_scores)
     print(f"  Average: {hard_avg:.4f}")
@@ -328,7 +328,7 @@ def main():
     print("=" * 60)
 
     
-    results["overall_average"] = round(overall_avg, 4)
+    results["overall_average"] = overall_avg
     results["model"] = MODEL
     os.makedirs("outputs", exist_ok=True)
     with open("outputs/baseline_results.json", "w") as f:
