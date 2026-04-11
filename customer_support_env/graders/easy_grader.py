@@ -121,8 +121,8 @@ class EasyGrader:
             + breakdown["sentiment"] * cls.SENTIMENT_WEIGHT
         )
         # OpenEnv strict requirement: (0, 1) exclusive
-        score = max(0.0001, min(0.9999, score))
-        breakdown = {k: max(0.0001, min(0.9999, float(v))) for k, v in breakdown.items()}
+        score = max(1e-6, min(1 - 1e-6, score))
+        breakdown = {k: max(1e-6, min(1 - 1e-6, float(v))) for k, v in breakdown.items()}
         
         feedback = "\n".join(feedback_parts)
         return round(score, 4), breakdown, feedback

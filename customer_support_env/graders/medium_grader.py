@@ -157,10 +157,10 @@ class MediumGrader:
 
         total = cls_score * cls.CLASSIFICATION_WEIGHT + reply_score * cls.REPLY_WEIGHT
         # OpenEnv strict requirement: (0, 1) exclusive
-        total = max(0.0001, min(0.9999, total))
+        total = max(1e-6, min(1 - 1e-6, total))
         breakdown = {
-            "classification": max(0.0001, min(0.9999, float(cls_score))),
-            "reply": max(0.0001, min(0.9999, float(reply_score)))
+            "classification": max(1e-6, min(1 - 1e-6, float(cls_score))),
+            "reply": max(1e-6, min(1 - 1e-6, float(reply_score)))
         }
         return round(total, 4), breakdown, "\n".join(feedback_parts)
 
