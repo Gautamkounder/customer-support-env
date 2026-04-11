@@ -137,4 +137,4 @@ class EasyGrader:
         breakdown = {k: _clamp(v) for k, v in breakdown.items()}
 
         feedback = "\n".join(feedback_parts)
-        return round(score, 4), breakdown, feedback
+        return _clamp(score), breakdown, feedback

@@ -132,7 +132,7 @@ class HardGrader:
             for k in weights
         )
 
-        return round(score, 4), breakdown, "\n".join(feedback_parts)
+        return _clamp(score), breakdown, "\n".join(feedback_parts)
 
     @classmethod
     def grade(
@@ -179,7 +179,7 @@ class HardGrader:
         total = max(1e-6, min(1 - 1e-6, total))
 
         return (
-            round(total, 4),
+            _clamp(total),
             {
                 "classification": max(1e-6, min(1 - 1e-6, float(cls_score))),
                 "reply": max(1e-6, min(1 - 1e-6, float(reply_score))),

@@ -127,7 +127,7 @@ class MediumGrader:
         w_total = sum(weights.values())
         score = sum(breakdown[k] * weights[k] / w_total for k in weights if k in breakdown)
 
-        return round(_clamp(score), 4), {k: _clamp(v) for k, v in breakdown.items()}, "\n".join(feedback_parts)
+        return _clamp(score), {k: _clamp(v) for k, v in breakdown.items()}, "\n".join(feedback_parts)
 
     @classmethod
     def grade(
@@ -165,7 +165,7 @@ class MediumGrader:
             "classification": _clamp(cls_score),
             "reply":          _clamp(reply_score),
         }
-        return round(total, 4), breakdown, "\n".join(feedback_parts)
+        return _clamp(total), breakdown, "\n".join(feedback_parts)
 
     @staticmethod
     def _check_resolution_points(reply: str, points: List[str]) -> int:
